@@ -1,10 +1,14 @@
 package antoniobertuccio.u5w2d4.controllers;
 
 import antoniobertuccio.u5w2d4.entities.Blogpost;
-import antoniobertuccio.u5w2d4.payloads.NewBlogPostPayload;
+import antoniobertuccio.u5w2d4.exceptions.BadRequestException;
+import antoniobertuccio.u5w2d4.payloads.NewBlogPostPayloadDTOClass;
 import antoniobertuccio.u5w2d4.services.BlogsService;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,8 +21,11 @@ public class BlogsController {
 
   @PostMapping("")
   @ResponseStatus(HttpStatus.CREATED)
-  public Blogpost saveBlog(@RequestBody NewBlogPostPayload body) {
-    return blogsService.save(body);
+  public Blogpost saveBlogPost(@RequestBody @Validated NewBlogPostPayloadDTOClass newBlogPost, @NotNull BindingResult validation) {
+    if (validation.hasErrors()) {
+      throw new BadRequestException(validation.getAllErrors());
+    }
+    return this.blogsService.saveBlogPost(newBlogPost.getAuthorId(), newBlogPost);
   }
 
   @GetMapping("")
@@ -33,7 +40,7 @@ public class BlogsController {
   }
 
   @PutMapping("/{blogId}")
-  public Blogpost findAndUpdate(@PathVariable int blogId, @RequestBody NewBlogPostPayload body) {
+  public Blogpost findAndUpdate(@PathVariable int blogId, @RequestBody NewBlogPostPayloadDTOClass body) {
     return blogsService.findByIdAndUpdate(blogId, body);
   }
 

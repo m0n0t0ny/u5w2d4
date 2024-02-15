@@ -3,7 +3,7 @@ package antoniobertuccio.u5w2d4.services;
 import antoniobertuccio.u5w2d4.entities.Author;
 import antoniobertuccio.u5w2d4.entities.Blogpost;
 import antoniobertuccio.u5w2d4.exceptions.NotFoundException;
-import antoniobertuccio.u5w2d4.payloads.NewBlogPostPayload;
+import antoniobertuccio.u5w2d4.payloads.NewBlogPostPayloadDTOClass;
 import antoniobertuccio.u5w2d4.repositories.BlogsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -12,13 +12,15 @@ import java.util.List;
 
 @Service
 public class BlogsService {
+
   @Autowired
   private BlogsRepository blogsRepository;
+
   @Autowired
   private AuthorsService authorsService;
 
-  public Blogpost save(NewBlogPostPayload body) {
-    Author author = authorsService.findById(body.getAuthorId());
+  public Blogpost saveBlogPost(int authorId, NewBlogPostPayloadDTOClass body) {
+    Author author = authorsService.findById(authorId);
     Blogpost newBlogPost = new Blogpost();
     newBlogPost.setReadingTime(body.getReadingTime());
     newBlogPost.setContent(body.getContent());
@@ -42,7 +44,7 @@ public class BlogsService {
     blogsRepository.delete(found);
   }
 
-  public Blogpost findByIdAndUpdate(int id, NewBlogPostPayload body) {
+  public Blogpost findByIdAndUpdate(int id, NewBlogPostPayloadDTOClass body) {
     Blogpost found = this.findById(id);
 
     found.setReadingTime(body.getReadingTime());
@@ -63,4 +65,3 @@ public class BlogsService {
     return blogsRepository.findByAuthor(author);
   }
 }
-
